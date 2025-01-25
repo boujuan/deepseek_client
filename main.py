@@ -1,16 +1,19 @@
+import re
+import sys
+import os
 from core.auth import SecretManager
 from core.config import ConfigManager
 from core.chat import ChatClient
 from core.tts import TTSService
-import sys
-import os
 
-# Color codes for console output
 RED = '\033[91m'
 BLUE = '\033[94m'
 PURPLE = '\033[95m'
 GREEN = '\033[92m'
 RESET_COLOR = '\033[0m'
+
+def strip_ansi_codes(s: str) -> str:
+    return re.sub(r'\x1b\[[0-9;]*m', '', s)
 
 class ChatApplication:
     def __init__(self):
@@ -39,11 +42,18 @@ class ChatApplication:
 
     def _get_prompt_prefixes(self):
         model_name = self.config['model'].upper()
-        prefix_length = 8 + len(model_name)
+
+        user_label_no_color = "👤 YOU [{}]"
+        bot_label_no_color  = f"🤖 {model_name} [{{}}]"
+
+        max_length = max(len(user_label_no_color), len(bot_label_no_color))
+
         return {
-            'user': f"{RED}👤 YOU [{{}}]<{{}}{RESET_COLOR}> ",
-            'bot': f"{BLUE}🤖 {model_name} [{{}}]<{{}}{RESET_COLOR}> ",
-            'length': prefix_length
+            'user_no_color': user_label_no_color,
+            'bot_no_color':  bot_label_no_color,
+            'max_length':    max_length,
+            'user_color': f"{RED}👤 YOU [{{}}]{RESET_COLOR}",
+            'bot_color':  f"{BLUE}🤖 {model_name} [{{}}]{RESET_COLOR}",
         }
 
     def run(self):
@@ -56,20 +66,29 @@ class ChatApplication:
             user_input = self._get_user_input(prompt_number, prefixes)
             if user_input.lower() in {'exit', 'end', 'quit'}:
                 break
-            
+
             response = self.chat_client.get_response(user_input, self.config)
             self._show_response(response, prompt_number, prefixes)
-            
+
             if self.tts_service:
                 self.tts_service.synthesize(response, prompt_number, self.config['voice'])
 
     def _get_user_input(self, prompt_number, prefixes):
-        user_prompt = prefixes['user'].format(prompt_number, ' ' * prefixes['length'])
-        return input(user_prompt).strip()
+        user_prefix_colored = prefixes['user_color'].format(prompt_number)
+        user_prefix_plain   = prefixes['user_no_color'].format(prompt_number)
+        spaces_needed = prefixes['max_length'] - len(user_prefix_plain)
+        final_prompt  = f"{user_prefix_colored}{' ' * spaces_needed}> "
+
+        return input(final_prompt).strip()
 
     def _show_response(self, response, prompt_number, prefixes):
-        bot_prompt = prefixes['bot'].format(prompt_number, ' ' * prefixes['length'])
-        print(f"{bot_prompt}{response}")
+        bot_prefix_colored = prefixes['bot_color'].format(prompt_number)
+        bot_prefix_plain   = prefixes['bot_no_color'].format(prompt_number)
+
+        spaces_needed = prefixes['max_length'] - len(bot_prefix_plain)
+        final_prompt  = f"{bot_prefix_colored}{' ' * spaces_needed}> "
+
+        print(f"{final_prompt}{response}")
 
 if __name__ == "__main__":
     try:
@@ -80,4 +99,4 @@ if __name__ == "__main__":
         sys.exit(0)
     except Exception as e:
         print(f"{RED}⚠️ Critical error: {e}{RESET_COLOR}")
-        sys.exit(1) 
+        sys.exit(1)
