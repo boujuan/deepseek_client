@@ -3,3 +3,4 @@
 *.key
 keys/secrets.yaml
 keys/secret.key
+keys/__pycache__/

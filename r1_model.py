@@ -1,4 +1,4 @@
-import argparse # Import argparse
+import argparse
 from openai import OpenAI
 import replicate
 import subprocess
@@ -10,6 +10,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
 import base64
 import glob
+from keys.encryptor import API_Encryptor
 
 RED = '\033[91m'
 BLUE = '\033[94m'
@@ -17,13 +18,32 @@ PURPLE = '\033[95m'
 GREEN = '\033[92m'
 RESET_COLOR = '\033[0m'
 
-# Load secrets.yaml API keys for deepseek and replicate
+# Load keys.yaml API keys for deepseek and replicate
 def load_secrets():
+    secrets_enc_path = "keys/keys.enc"
+    secrets_yaml_path = "keys/keys.yaml"
+
+    if not os.path.exists(secrets_enc_path): # Check if keys.enc exists
+        print(f"{RED}keys.enc not found.{RESET_COLOR}")
+        if os.path.exists(secrets_yaml_path): # Check if keys.yaml exists
+            print(f"{GREEN}Encrypting keys.yaml to create keys.enc...{RESET_COLOR}")
+            encryptor = API_Encryptor()
+            if not encryptor.encrypt_secrets_file(): # Encrypt keys.yaml
+                print(f"{RED}Encryption failed. Please check {secrets_yaml_path} and try again.{RESET_COLOR}")
+                return None
+        else: # If keys.yaml also doesn't exist
+            print(f"{GREEN}keys.yaml not found. Creating it and encrypting to keys.enc...{RESET_COLOR}")
+            encryptor = API_Encryptor()
+            if not encryptor.create_secrets_yaml_and_encrypt(): # Create keys.yaml and encrypt
+                print(f"{RED}Failed to create and encrypt keys. Please check and try again.{RESET_COLOR}")
+                return None
+
+
     while True:
         password = getpass.getpass(f"{GREEN}Enter decryption password: {RESET_COLOR}").encode()
         print()
         try:
-            with open("keys/secrets.enc", "rb") as f:
+            with open(secrets_enc_path, "rb") as f:
                 data = f.read()
                 salt = data[:16]
                 encrypted_data = data[16:]
@@ -38,13 +58,13 @@ def load_secrets():
 
             cipher_suite = Fernet(key)
             decrypted_data = cipher_suite.decrypt(encrypted_data)
-            return yaml.safe_load(decrypted_data) 
-        
+            return yaml.safe_load(decrypted_data)
+
         except InvalidToken:
             print(f"{RED}⚠️ Decryption failed: Incorrect password. Please try again.{RESET_COLOR}")
             continue
         except Exception as e:
-            print(f"{RED}⚠️ Error loading secrets: {e}{RESET_COLOR}")
+            print(f"{RED}⚠️ Error loading keys: {e}{RESET_COLOR}")
             return None
 
 # Load config.yaml and client for deepseek with API key
@@ -53,6 +73,9 @@ def load_config(args):
         config = yaml.safe_load(f)
 
     secrets = load_secrets()
+    if secrets is None: # Exit if secrets loading failed in load_secrets()
+        print(f"{RED}Failed to load keys. Exiting.{RESET_COLOR}")
+        exit(1)
 
     client = OpenAI(api_key=secrets['DEEPSEEK_API_KEY'], base_url="https://api.deepseek.com")
     os.environ["REPLICATE_API_TOKEN"] = secrets['REPLICATE_API_TOKEN']

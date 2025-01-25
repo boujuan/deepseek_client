@@ -162,4 +162,3 @@ deepseek-r1-chat/             (Root directory)
 *   **Never commit `secrets.yaml` to version control.** Ensure it is added to your `.gitignore` file.
 *   Keep your encryption password secure. If you lose it, you will not be able to decrypt your API keys.
 *   Treat your API keys as sensitive information and avoid sharing them publicly.
-```
