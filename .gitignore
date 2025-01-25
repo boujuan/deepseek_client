@@ -1,6 +1,10 @@
 *.wav
 *.enc
 *.key
+*.pyc
 keys/secrets.yaml
 keys/secret.key
-keys/__pycache__/
+keys/__pycache__/*
+core/__pycache__/*
+output/
+
