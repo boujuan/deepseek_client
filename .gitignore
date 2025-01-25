@@ -1,1 +1,5 @@
 *.wav
+*.enc
+*.key
+keys/secrets.yaml
+keys/secret.key

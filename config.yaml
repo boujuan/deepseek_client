@@ -1,0 +1,9 @@
+system_prompts:
+  default: "You are a helpful assistant"
+  developer: "You are a senior Python developer assisting with coding questions"
+  brief: "You are a helpful assistant that provides very brief and concise answers"
+
+selected_prompt: "default"
+model: "deepseek-reasoner" # "deepseek-chat" or "deepseek-reasoner"
+use_voice: false
+voice: "af_bella" 
