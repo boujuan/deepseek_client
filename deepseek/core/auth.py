@@ -6,14 +6,17 @@ import os
 from pathlib import Path
 import yaml
 import getpass
-from keys.encryptor import API_Encryptor
+from deepseek.keys.encryptor import API_Encryptor
 
 class SecretManager:
     def __init__(self, enc_path=None, yaml_path=None):
+        deepseek_dir = Path.home() / ".deepseek"
+        os.makedirs(deepseek_dir, exist_ok=True)
+
         if not enc_path:
-            enc_path = str(Path.home() / ".deepseek" / "keys.enc")
+            enc_path = str(deepseek_dir / "keys.enc")
         if not yaml_path:
-            yaml_path = str(Path.home() / ".deepseek" / "keys.yaml")
+            yaml_path = str(deepseek_dir / "keys.yaml")
 
         self.enc_path = enc_path
         self.yaml_path = yaml_path

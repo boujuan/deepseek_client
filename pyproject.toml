@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "deepseek-r1-client"
-version = "0.1.0"
+version = "0.1.2"
 description = "DeepSeek R1 Model Chat Client with optional TTS"
 authors = [
   { name = "Boujuan", email = "Jmb0507@gmail.com" }
@@ -30,7 +30,7 @@ dependencies = [
 include-package-data = true
 
 [project.scripts]
-deepseek = "deepseek.main:main_entry"
+deepseek-client = "deepseek.main:main_entry"
 
 [project.entry-points.console_scripts]
-deepseek = "deepseek.main:main_entry" 
+deepseek-client = "deepseek.main:main_entry" 

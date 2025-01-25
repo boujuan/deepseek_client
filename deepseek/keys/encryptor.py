@@ -23,6 +23,8 @@ class API_Encryptor:
         return salt, key
 
     def encrypt_secrets_file(self):
+        # print(f"encrypt_secrets_file: secrets_yaml_path is {self.secrets_yaml_path}")
+        # print(f"Checking if {self.secrets_yaml_path} exists before opening: {os.path.exists(self.secrets_yaml_path)}")
         password = getpass.getpass("Enter encryption password to create keys.enc: ").encode()
         salt, key = self._derive_key(password)
         cipher_suite = Fernet(key)
@@ -62,13 +64,10 @@ class API_Encryptor:
         with open(self.secrets_yaml_path, 'w') as yaml_file:
             yaml.dump(secrets_data, yaml_file)
         print(f"{self.secrets_yaml_path} created.")
+        # print(f"Checking if {self.secrets_yaml_path} exists after creation: {os.path.exists(self.secrets_yaml_path)}")
+        print(f"Absolute path: {os.path.abspath(self.secrets_yaml_path)}")
 
         if self.encrypt_secrets_file():
-            try:
-                os.remove(self.secrets_yaml_path)
-                print(f"Deleted {self.secrets_yaml_path} for security reasons.")
-            except Exception as e:
-                print(f"Warning: Failed to delete {self.secrets_yaml_path}. Please delete it manually for security. Error: {e}")
             return True
         else:
             return False
