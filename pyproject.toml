@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deepseek-r1-client"
+version = "0.1.0"
+description = "DeepSeek R1 Model Chat Client with optional TTS"
+authors = [
+  { name = "Boujuan", email = "Jmb0507@gmail.com" }
+]
+readme = "README.md"
+license = { file = "LICENSE" }
+keywords = ["deepseek", "chatbot", "AI", "openai", "replicate", "tts"]
+classifiers = [
+  "Programming Language :: Python :: 3.12",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+
+# Project dependencies
+dependencies = [
+  "pyyaml",
+  "cryptography",
+  "replicate",
+  "openai",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[project.scripts]
+deepseek = "deepseek.main:main_entry"
+
+[project.entry-points.console_scripts]
+deepseek = "deepseek.main:main_entry" 

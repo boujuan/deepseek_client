@@ -2,9 +2,10 @@
 *.enc
 *.key
 *.pyc
-keys/secrets.yaml
-keys/secret.key
-keys/__pycache__/*
-core/__pycache__/*
-output/
-
+deepseek/keys/secrets.yaml
+deepseek/keys/secret.key
+deepseek/keys/__pycache__/*
+deepseek/core/__pycache__/*
+deepseek/output/
+build/
+deepseek_r1_client.egg-info/

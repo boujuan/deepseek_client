@@ -1,13 +1,18 @@
 import yaml
 import argparse
+import os
+import importlib.resources as pkg_resources
 
 class ConfigManager:
-    def __init__(self, config_path="config.yaml"):
-        self.config_path = config_path
+    def __init__(self, config_path=None):
+        if config_path and os.path.exists(config_path):
+            self.config_path = config_path
+        else:
+            self.config_path = pkg_resources.files("deepseek.data") / "config.yaml"
         self.config = self._load_base_config()
         
     def _load_base_config(self):
-        with open(self.config_path) as f:
+        with open(self.config_path, "r", encoding="utf-8") as f:
             return yaml.safe_load(f)
     
     def apply_cli_args(self, args):

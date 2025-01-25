@@ -3,12 +3,18 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
 import base64
 import os
+from pathlib import Path
 import yaml
 import getpass
 from keys.encryptor import API_Encryptor
 
 class SecretManager:
-    def __init__(self, enc_path="keys/keys.enc", yaml_path="keys/keys.yaml"):
+    def __init__(self, enc_path=None, yaml_path=None):
+        if not enc_path:
+            enc_path = str(Path.home() / ".deepseek" / "keys.enc")
+        if not yaml_path:
+            yaml_path = str(Path.home() / ".deepseek" / "keys.yaml")
+
         self.enc_path = enc_path
         self.yaml_path = yaml_path
         
