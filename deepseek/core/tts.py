@@ -2,10 +2,13 @@ import replicate
 import subprocess
 import os
 import glob
+from pathlib import Path
 
 class TTSService:
     def __init__(self):
-        self.output_dir = "output"
+        deepseek_dir = Path.home() / ".deepseek"
+        self.output_dir = deepseek_dir / "tts_output"
+        os.makedirs(self.output_dir, exist_ok=True)
         self._clean_old_files()
         
     def synthesize(self, text, prompt_number, voice="af_bella", speed=1.1):
